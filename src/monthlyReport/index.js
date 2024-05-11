@@ -9,6 +9,22 @@ const notion = new Client({
     auth: process.env.NOTION_TOKEN,
 });
 
+const monthIcon = {
+    0: '🔵',
+    1: '🔵',
+    2: '🟢',
+    3: '🟢',
+    4: '🟢',
+    5: '🟣',
+    6: '🟣',
+    7: '🟣',
+    8: '🟠',
+    9: '🟠',
+    10: '🟠',
+    11: '🔵',
+};
+
+
 export const getDatabase = async () => {
     const databaseId = process.env.LEARNING_DB_ID;
 
@@ -43,12 +59,19 @@ const getPreviousMonthName = () => {
     return previousMonth.charAt(0).toUpperCase() + previousMonth.slice(1);
 };
 
+const getPreviousMonthIcon = () => {
+    const currentDate = new Date();
+    currentDate.setDate(1);
+    currentDate.setDate(0);
+
+    return monthIcon[currentDate.getMonth()];
+};
+
 
 const createReport = async () => {
     const categories = db.map(item => item.Category.multi_select).flat();
 
     const categoriesSet = uniqBy(categories, 'name');
-    console.log(categoriesSet);
 
     const blockChildren = [];
     categoriesSet.forEach(cat => {
@@ -65,6 +88,7 @@ const createReport = async () => {
             },
         });
         const categoryPages = db.filter(item => item.Category.multi_select.includes(cat));
+        console.log(categoryPages);
         categoryPages.forEach(page => {
             blockChildren.push({
                 'object': 'block',
@@ -85,7 +109,7 @@ const createReport = async () => {
     const response = await notion.pages.create({
         'parent': {
             'type': 'database_id',
-            'database_id': '28f1093683cc414b9213ba2614b3670d',
+            'database_id': process.env.REPORT_DB_ID,
         },
         'properties': {
             'Name': {
@@ -97,6 +121,10 @@ const createReport = async () => {
                     },
                 ],
             },
+        },
+        'icon': {
+            'type': 'emoji',
+            'emoji': getPreviousMonthIcon(),
         },
         'children': blockChildren,
     });
