@@ -133,7 +133,6 @@ const saveReport = async () => await notion.pages.create({
 });
 
 const updateFinishedTasksState = async () => {
-
     const finishedTasks = dbPages.filter(item => item.properties.Status.select && item.properties.Status.select.name === 'Finished');
     const promises = finishedTasks.map(task => {
         return notion.pages.update({
@@ -150,7 +149,18 @@ const updateFinishedTasksState = async () => {
 };
 
 const updateLastMonthState = async () => {
+    const promises = dbPages.map(task => {
+        return notion.pages.update({
+            page_id: task.id,
+            properties: {
+                'Last Month State': {
+                    number: task.properties.Completed.number,
+                },
+            },
+        });
+    });
 
+    await Promise.all(promises);
 };
 
 export const createMonthlyReport = async () => {
