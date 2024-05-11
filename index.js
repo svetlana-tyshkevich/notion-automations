@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { getDatabase } from './src/monthlyReport/index.js';
+import { createMonthlyReport } from './src/monthlyReport/index.js';
 
 const port = 3000;
 const server = http.createServer((req, res) => {
@@ -12,7 +12,7 @@ server.listen(port, () => {
 });
 
 try {
-    await getDatabase();
+    await createMonthlyReport();
 } catch (e) {
     console.error(e);
 }
