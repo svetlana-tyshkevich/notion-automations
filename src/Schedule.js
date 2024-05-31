@@ -6,6 +6,4 @@ export const monthlyJob = new CronJob('0 11 1 * *', async () => {
     await createMonthlyReport();
 }, null, true, 'UTC');
 
-export const runSchedule = () => {
-    monthlyJob.start();
-};
+
